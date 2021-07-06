@@ -796,17 +796,27 @@ func (t *Tag) validateAndReset(prefix string, start int) error {
 func (config *YAMLConfig) expandDirectoryToFiles(dir string) error {
 
 	var err error
+	// change config.Files in its own iter is not a good idea, so save value and change it later
+	var newFiles []*File
 
 	for i := range config.Files {
 		// query by wildcard, so this line may be error :)
-		osStat, err := os.Stat(*config.Files[i].Path)
-		if err != nil {
+		files, err := filepath.Glob(filepath.Join(dir, *config.Files[i].Path))
+		if err != nil || len(files) == 0 {
+			err = errors.New(fmt.Sprintf("error string: %s", *config.Files[i].Path))
 			logger.Errorf("%s", err)
 		}
-		if osStat.IsDir() {
-			//TODO(yuyu): expand directory config to file config
+
+		// maybe I missed the usage of pointer :(
+		// I'll do another test
+		for j := range files {
+			eachConf := config.Files[i]
+			eachConf.Path = &files[j]
+			newFiles = append(newFiles, eachConf)
 		}
+
 	}
+	config.Files = newFiles
 
 	return err
 }
