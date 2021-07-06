@@ -183,6 +183,11 @@ func (config *YAMLConfig) ValidateAndReset(dir string) error {
 		return errors.New("There is no files in configuration")
 	}
 
+	//TODO(yuyu): check each item in config.Files
+	// if item is a directory, iter this directory and replace this directory config section by filename config section
+	if err := config.expandDirectoryToFiles(dir); err != nil {
+		logger.Errorf("%s", err)
+	}
 	for i := range config.Files {
 		if err := config.Files[i].validateAndReset(dir, fmt.Sprintf("files[%d]", i)); err != nil {
 			return err
@@ -785,4 +790,23 @@ func (t *Tag) validateAndReset(prefix string, start int) error {
 		}
 	}
 	return nil
+}
+
+// TODO(yuyu): discuss about the config schema for import by directory
+func (config *YAMLConfig) expandDirectoryToFiles(dir string) error {
+
+	var err error
+
+	for i := range config.Files {
+		// query by wildcard, so this line may be error :)
+		osStat, err := os.Stat(*config.Files[i].Path)
+		if err != nil {
+			logger.Errorf("%s", err)
+		}
+		if osStat.IsDir() {
+			//TODO(yuyu): expand directory config to file config
+		}
+	}
+
+	return err
 }
