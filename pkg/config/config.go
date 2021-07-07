@@ -800,7 +800,8 @@ func (config *YAMLConfig) expandDirectoryToFiles(dir string) error {
 	var newFiles []*File
 
 	for i := range config.Files {
-		// query by wildcard, so this line may be error :)
+		// treat all string as glob pattern
+		// query by wildcard
 		files, err := filepath.Glob(filepath.Join(dir, *config.Files[i].Path))
 		if err != nil || len(files) == 0 {
 			err = errors.New(fmt.Sprintf("error string: %s", *config.Files[i].Path))
@@ -808,7 +809,7 @@ func (config *YAMLConfig) expandDirectoryToFiles(dir string) error {
 		}
 
 		// maybe I missed the usage of pointer :(
-		// I'll do another test
+		logger.Infof("query file from pattern: %s, result: %v", *config.Files[i].Path, files)
 		for j := range files {
 			eachConf := config.Files[i]
 			eachConf.Path = &files[j]
