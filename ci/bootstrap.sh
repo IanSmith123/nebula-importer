@@ -7,11 +7,12 @@ port=$2
 
 export GOPATH=/usr/local/nebula/
 export GO111MODULE=on
+export GOPROXY=https://goproxy.io,direct
 
 # build nebula-console
 mkdir -p nebulaconsolebuild
 cd nebulaconsolebuild
-  wget "https://github.com/vesoft-inc/nebula-console/archive/master.zip" -O nebula-console.zip
+  wget "https://github.com.cnpmjs.org/vesoft-inc/nebula-console/archive/master.zip" -O nebula-console.zip
   unzip ./nebula-console.zip -d ./
   cd nebula-console-master
     go build -o ../../nebula-console
